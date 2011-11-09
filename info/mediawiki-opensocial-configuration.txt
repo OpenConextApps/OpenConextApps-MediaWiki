@@ -1,0 +1,75 @@
+MediaWiki OpenSocial group support configuration
+================================================================
+Date: 2011-nov-07
+Author: M. Dobrinic
+
+The conext extension is developed to fetch groups from an OpenSocial
+container, and insert them into MediaWiki's (implicit) group-list
+of an authenticated in user.
+MediaWiki's authorization mechanism can be used to create 
+authorization-profiles for these external groups, primarily through
+definitions in the LocalSettings.php file.
+
+
+Conext extension configuration
+------------------------------
+- Install the conext-extension files in /extensions/conext
+- Review the configuration file conext/config.ini
+  Make sure that the consumer-key and -secret are
+    set correctly
+
+- Include the conext-extension from LocalSettings, by appending
+  the following lines to /etc/mediawiki/LocalSettings.php:
+  
+/* Try to develop Group Support */
+if (!$wgCommandLineMode) {
+	require_once("extensions/conext/GroupContext.php");
+}
+
+
+- If you want to enable debug-level logging of the conext-extension,
+  you have to configure these lines right before the previous inserted
+  block (note: choose a filename that can be created/written by the
+  webserver-user)
+
+if (! is_array($wgDebugLogGroups)) {
+  $wgDebugLogGroups = array();
+}
+$wgDebugLogGroups['conext'] = 'logs/conext.log';
+
+
+Configure MediaWiki Auhorization Profiles
+-----------------------------------------
+MediaWiki specifies that group authorization profiles should be defined in
+the LocalSettings.php file.
+While this is possible, it is also suggested to create a separate file
+for these profiles, and include this file from LocalSettings.php
+
+- Create a Group Authorization Profile file, called
+  /etc/mediawiki/GroupAuthorizations.php
+  to manage your Group Authorization profiles (see below)
+  
+- Refer to GroupAuthorizations.php from LocalSettings.php, by appending
+  the follow line to /etc/mediawiki/LocalSettings.php
+
+require_once('GroupAuthorizations.php');
+ 
+- Example GroupAuthorizations.php contents
+
+<?php
+global $wgGroupPermissions;
+
+// Apply the 'sysop' profile to an external group
+$wgGroupPermissions['nl:surfnet:diensten:my-sysop-team'] = $wgGroupPermissions['sysop'];
+
+// Apply the 'bureaucrat'-profile to another external group
+$wgGroupPermissions['nl:surfnet:diensten:my-fellow-bureaucrats-team'] = 
+		$wgGroupPermissions['bureaucrat'];
+ 
+// Revoke the 'edit' permission for everyone.
+$wgGroupPermissions['*']['edit']              = false;
+// Revoke for users, too: by default 'user' is allowed to edit, even if '*' is not.
+$wgGroupPermissions['user']['edit']           = false;
+
+?>
+

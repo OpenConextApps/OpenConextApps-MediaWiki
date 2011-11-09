@@ -1,0 +1,58 @@
+MediaWiki MultiAuthPlugin configuration
+================================================================
+Date: 2011-nov-03
+Author: M. Dobrinic
+
+
+MultiAuthPlugin was created to support external authentication,
+for example using SimpleSAMLphp. It was taken from the source
+and updated to support MediaWiki 1.17 and SimpleSAMLphp 1.8.0
+
+Pre requisites for using MultiAuthPlugin are an installed and
+configured SimpelSAMLphp installation.
+
+
+SimpleSAMLphp configuration
+---------------------------
+- Install SimpleSAMLphp in /var/www/simplesamlphp
+- Add alias in Apache Virtual-host definition:
+  
+    <VirtualHost ...>
+      ...
+      Alias /var/www/simplesaml-x.y.z/www
+      ...
+    </VirtualHost> 
+ 
+- Configure the appropriate metadata in the metadata/ directory
+- Ensure NameID is being provided in the set of attributes:
+  In config.php: authproc.sp : make sure NameID is made available in user attributes:
+     20  => array('class' => 'saml:NameIDAttribute',
+          'attribute' => 'NameID',
+          'format' => '%V',)
+          
+- Session Cookie alignment; set the SimpleSAMLphp session-name
+  to the MediaWiki session-name:
+  In config.php:
+  session.phpsession.cookiename'  => 'mediawiki_mw__session',
+  
+
+
+MultiAuthPlugin configuration
+---------------------------
+- Install the MultiAuthPlugin files in /extensions/MultiAuthPlugin
+- Review the configuration in MultiAuthPlugin.config.php
+- Enable the MultiAuthPlugin in /etc/mediawiki/LocalSettings.php
+  by appending the following lines:
+  
+      // Hook external authentication into MediaWiki 
+      define('SIMPLESAML_PATH', '/Users/dopey/Projects/SURFnet/MediaWiki/Workspace/simplesaml');
+      require_once(SIMPLESAML_PATH."/lib/_autoload.php");
+
+      /* try MultiAuthPlugin */
+      if (!$wgCommandLineMode) {
+          # extension includes
+          require_once("extensions/MultiAuthPlugin/MultiAuthPlugin.php");
+      }
+  
+
+  
