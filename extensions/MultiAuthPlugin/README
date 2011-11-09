@@ -1,0 +1,81 @@
+
+MediaWiki MultiAuthPlugin
+-------------------------
+
+0. Quick usage
+--------------
+The 'MultiAuthPlugin/' folder should be placed under the 'wiki/extensions/' directory.
+
+The plugin can be activated by putting the following lines at the _end_ 
+of the 'wiki/LocalSettings.php'
+
+if (!$wgCommandLineMode) {
+    # extension includes
+    require_once("extensions/MultiAuthPlugin/MultiAuthPlugin.php");
+}
+
+To activate the debug log capability you have to make the 'log/' directory 
+writeable by the web server and create a 'log/debug.log' file - also writeable 
+by the web server.
+
+
+
+
+1. Introduction
+---------------
+At the Regional Computing Centre Erlangen (RRZE) we use the popular MediaWiki
+software (http://www.mediawiki.org/) in many projects for documentation and
+publication purposes.
+
+With the development of a Single Sign On infrastructure based on SimpleSAMLphp
+and Shibboleth we needed to make MediaWiki SSO capable in a flexible and easily
+configurable way. We are aware that there are already extensions out there
+providing simple SSO capabilities, but we wanted more.
+
+So we started developing the MediaWiki MultiAuthPlugin with the goal to provide
+a single plugin to manage all possible authentication scenarios with one
+single extension -- for example local authentication via original 
+MediaWiki login dialog (as fallback), SSO via Shibboleth, SSO via
+SimpleSAMLphp, and so on.
+
+
+
+
+2. Requirements
+---------------
+The MediaWiki MultiAuthPlugin was developed and	tested using MediaWiki v1.13.4
+and v1.15.1. So the MultiAuthPlugin should be working flawlessly with these 
+versions. 
+
+
+
+
+3. Features
+-----------
+The MultiAuthPlugin hacks into MW's UserLoadFromSession Hook and replaces the
+global $wgAuth authentication instance to take complete control of the user
+authentication.
+
+In addition the extension also installs two new special pages to replace the 
+original login/logout special pages. This way the user can choose how he would
+like to authenticate from the configured methods.
+
+The plugin allows you to 
+	- use local MW authentication in parallel with external authentication
+	- completely forbid local authentication - if desired
+	- configure an external authentication library for SSO
+		Currently one of {Shibboleth, SimpleSAMLphp} is possible at a time
+	- auto-create local user accounts if authenticated externally
+	- auto-update changed user preferences in local user accounts if 
+		authenticated externally
+	- send e-mail notification about auto-created users to a configurable e-mail 
+		address
+
+
+If you make the log/ directory writeable the extension also provides a 
+debug.log file to help you identify possible errors.
+
+
+4. Notes
+--------
+None, yet.
