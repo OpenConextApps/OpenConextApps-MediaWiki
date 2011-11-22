@@ -190,6 +190,9 @@ class GroupContext {
 				// $g->set($group->getIdentifier(), $group->_aAttributes["title"]);
  				$groupContextGroups[] = $group->getIdentifier();
  
+ 				// Attempt to introduce the language key to MW: does not work yet! (MD; 2011/11/22)
+ 				global $wgMessageCache, $wgLang;
+				$wgMessageCache->addMessage($group->getIdentifier(), $group->_aAttributes["title"], 'nl');
  				// $a = array($group->getIdentifier() => $group->_aAttributes["title"]);
 				// $msgs->addMessages($a);
 				
