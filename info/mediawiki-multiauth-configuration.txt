@@ -40,6 +40,9 @@ SimpleSAMLphp configuration
 MultiAuthPlugin configuration
 ---------------------------
 - Install the MultiAuthPlugin files in /extensions/MultiAuthPlugin
+  The extension can be found in the svn-repository:
+  /extensions/MultiAuthPlugin
+
 - Review the configuration in MultiAuthPlugin.config.php
 - Enable the MultiAuthPlugin in /etc/mediawiki/LocalSettings.php
   by appending the following lines:

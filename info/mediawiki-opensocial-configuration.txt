@@ -14,6 +14,9 @@ definitions in the LocalSettings.php file.
 Conext extension configuration
 ------------------------------
 - Install the conext-extension files in /extensions/conext
+  The extension can be found in the svn-repository under:
+  /extensions/conext
+
 - Review the configuration file conext/config.ini
   Make sure that the consumer-key and -secret are
     set correctly
