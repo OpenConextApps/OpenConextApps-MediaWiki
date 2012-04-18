@@ -44,13 +44,13 @@ class GroupRelationsImpl extends IGroupRelations {
 
 		$this->_strictMode = ($config["strictMode"] == TRUE);
 		
-		$this->_msgSource = $config["msgSource"];
+		$this->_msgSource = (isset($config["msgSource"])?$config["msgSource"]:null);
 		
 		$provider_config = $config["provider"];
 		$cln = $provider_config["class"];
 		$this->_osapiProvider = new $cln(NULL, $provider_config);
 		
-		$this->_filestoragepath = '/tmp/osapi-mw';
+		$this->_filestoragepath = '/tmp/osapi';
 	}
 	
 	
@@ -84,7 +84,7 @@ class GroupRelationsImpl extends IGroupRelations {
   						)
   					);
   					
-		if ($strictMode) {
+		if ($this->_strictMode) {
 			$osapi->setStrictMode($strictMode);
 		}
   
@@ -123,7 +123,7 @@ class GroupRelationsImpl extends IGroupRelations {
 
   		$osapi = new osapi($this->_osapiProvider, $auth);
         
-		if ($strictMode) {
+		if ($this->_strictMode) {
 			$osapi->setStrictMode($strictMode);
 		}
         
@@ -143,6 +143,30 @@ class GroupRelationsImpl extends IGroupRelations {
 		// Send the batch request.
 		$result = $batch->execute();
         
+		if ($result[$keytoset] instanceof osapiError) {
+			$err = $result[$keytoset];
+			if ($err->getErrorCode() == 401) {
+				// Token did not authorize the request; dispose of it, and
+				// get a new one:
+				if (($token = $storage->get($auth->storageKey)) !== false) {
+      				$storage->delete($auth->storageKey);
+      				
+      				/* protect against infinite local loop */
+      				$this->_token_retry_count = (isset($this->_token_retry_count)? $this->_token_retry_count+1 : 1);
+      				if ($this->_token_retry_count < 3) {
+	      				$this->prepareClient($user_params['userId']);
+	      				return $this->callOpenSocial($user_params, $osapi_service, $keytoset);
+      				} else {
+      					throw new Exception("Could not establish accesstoken");
+      				}
+	      				
+				} else {
+					throw new Exception("Problem occured when performing OpenSocial call: {$osapi_service}");
+				}
+				
+			}
+		}
+		
 		return $result;
 	}
     
